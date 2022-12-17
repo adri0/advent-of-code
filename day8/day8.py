@@ -75,11 +75,9 @@ def scenic_score(trees_mat, i_tree, j_tree):
 
 def max_scenic_score(trees_mat: list[list[int]]) -> int:
     max_score = 0
-    for i in range(0, len(trees_mat[0])):
-        for j in range(0, len(trees_mat)):
-            score = scenic_score(trees_mat, i, j)
-            if score > max_score:
-                max_score = score
+    for i in range(len(trees_mat[0])):
+        for j in range(len(trees_mat)):
+            max_score = max(scenic_score(trees_mat, i, j), max_score)
     return max_score
 
 
