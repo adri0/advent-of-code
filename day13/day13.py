@@ -1,51 +1,6 @@
 from functools import reduce
 from operator import mul, add
-
-
-def parse_list(list_string: str) -> list:
-    assert list_string[0] == "[" and list_string[-1] == "]"
-    result_list = []
-    i_start = 1
-    while i_start < len(list_string):
-        match list_string[i_start]:
-            case char if char.isnumeric():
-                i_end = find_number_end(list_string, i_start)
-                element = list_string[i_start : i_end]
-                result_list.append(int(element))
-            case "[":
-                i_end = find_list_end(list_string, i_start)
-                element = list_string[i_start : i_end]
-                result_list.append(parse_list(element))
-            case "" | "]":
-                break
-            case _:
-                raise Exception(f"Cannot parse list from element: {element}")
-        i_start += len(element) + 1
-    return result_list
-
-
-def find_number_end(string, number_start):
-    return min(
-        filter(
-            lambda pos: pos > -1, [
-                string.find(",", number_start),
-                string.find("]", number_start)
-            ]
-        )
-    )
-
-
-def find_list_end(string, list_start):
-    n_open_brackets = 0
-    for i in range(list_start + 1, len(string)):
-        if string[i] == "[":
-            n_open_brackets += 1
-        elif string[i] == "]":
-            if n_open_brackets == 0:
-                return i + 1
-            else:
-                n_open_brackets -= 1
-    raise Exception(f"Unable to find list end for {string[list_start:]}")
+import json
 
 
 def packets_in_order(left, right):
@@ -74,7 +29,7 @@ def packets_in_order(left, right):
 
 
 packet_pairs = [
-    list(map(parse_list, packet_pair_str.split()))
+    list(map(json.loads, packet_pair_str.split()))
     for packet_pair_str in open("input.txt").read().split("\n\n")
 ]
 
