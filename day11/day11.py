@@ -15,7 +15,7 @@ class Monkey:
     common_divisor = None
 
     def next_monkey(self, item_worry) -> int:
-        if is_divisable_by(item_worry, self.divisor):
+        if item_worry % self.divisor == 0:
             return self.monkey_div_true 
         else:
             return self.monkey_div_false
@@ -29,11 +29,8 @@ class Monkey:
             yield item_worry, self.next_monkey(item_worry)
 
 
-def is_divisable_by(num, divisor):
-    return num % divisor == 0
-
-
 def parse_operation(op_string):
+    """ Parse a string like 'new = old * 3' into a function """
     parts = op_string.split()
     num1 = int(parts[2]) if parts[2].isnumeric() else None
     num2 = int(parts[4]) if parts[4].isnumeric() else None
@@ -68,12 +65,15 @@ def monkey_biz(monkeys, n_rounds):
     return i1 * i2
 
 
-input_str = open("input.txt").read()
-monkeys = list(map(parse_monkey_str, input_str.split("\n\n")))
-Monkey.common_divisor = reduce(lambda n1, n2: n1 * n2, set(map(lambda m: m.divisor, monkeys)))
+def get_monkeys(input_path="input.txt"):
+    input_str = open(input_path).read()
+    monkeys = list(map(parse_monkey_str, input_str.split("\n\n")))
+    Monkey.common_divisor = reduce(
+        operator.mul, 
+        set(map(lambda m: m.divisor, monkeys))
+    )
+    return monkeys
 
-print("Monkey biz (10 rounds):", monkey_biz(monkeys, n_rounds=20))
 
-monkeys = list(map(parse_monkey_str, input_str.split("\n\n")))
-
-print("Monkey biz (10_000 rounds):", monkey_biz(monkeys, n_rounds=10_000))
+print("Monkey biz (10 rounds):", monkey_biz(get_monkeys(), n_rounds=10))
+print("Monkey biz (10_000 rounds):", monkey_biz(get_monkeys(), n_rounds=10_000))

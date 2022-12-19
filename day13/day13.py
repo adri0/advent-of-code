@@ -28,36 +28,59 @@ def packets_in_order(left, right):
     return None  # Unable to decide
 
 
-packet_pairs = [
-    list(map(json.loads, packet_pair_str.split()))
-    for packet_pair_str in open("input.txt").read().split("\n\n")
-]
-
-sum_orderd_packet_pairs = sum(
-    [
-        i + 1
-        for i, (left, right) in enumerate(packet_pairs) 
-        if packets_in_order(left, right)
+def read_packet_pairs(input_path):
+    return [
+        list(map(json.loads, packet_pair_str.split()))
+        for packet_pair_str in open(input_path).read().split("\n\n")
     ]
-)
-
-print("Sum of indices of ordered packets pairs:", sum_orderd_packet_pairs)
 
 
-# -- Part 2 -- #
+def sum_pairs_in_order(packet_pairs):
+    return sum(
+        [
+            i + 1
+            for i, (left, right) in enumerate(packet_pairs) 
+            if packets_in_order(left, right)
+        ]
+    )
+
+
+def part1(input_path):
+    packet_pairs = read_packet_pairs(input_path)
+    result = sum_pairs_in_order(packet_pairs)
+    print("Sum of indices of pairs in order:", result)
+
 
 class Packet(list):
     def __lt__(self, other):
         return packets_in_order(self, other)
 
 
-divider_packets = [[[2]], [[6]]]
-all_packets = reduce(add, [[left] + [right] for left, right in packet_pairs])
-sorted_packets = sorted(map(Packet, all_packets + divider_packets))
+DIVIDER_PACKETS = [[[2]], [[6]]]
 
-prod_divider_indices = reduce(
-    mul, 
-    [i + 1 for i, packet in enumerate(sorted_packets) if packet in divider_packets]
-)
 
-print("Product of divider packet indices:", prod_divider_indices)
+def sort_packets(packet_pairs):
+    return sorted(map(Packet, reduce(add, packet_pairs) + DIVIDER_PACKETS))
+
+
+def prod_divider_indices(sorted_packets):
+    return reduce(
+        mul, 
+        [
+            i + 1 
+            for i, packet in enumerate(sorted_packets) 
+            if packet in DIVIDER_PACKETS
+        ]
+    )
+
+
+def part2(input_path):
+    packet_pairs = read_packet_pairs(input_path)
+    sorted_packets = sort_packets(packet_pairs)
+    result = prod_divider_indices(sorted_packets)
+    print("Product of divider packet indices:", result)
+
+
+input_path = "input.txt"
+part1(input_path)
+part2(input_path)
