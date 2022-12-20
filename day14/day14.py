@@ -1,62 +1,107 @@
+Point = tuple[int, int]
+Canvas = list[list[Point]]
 
-def segment_to_points(a, b):
+AIR = "."
+ROCK = "#"
+SAND = "o"
+HOLE_POS = (500, 0)
+
+
+def segment_to_points(a: Point, b: Point) -> list[Point]:
     """ Create all points between a pair of points """
-    ax, ay = a
-    bx, by = b
-    if ax == bx:
-        return {(ax, y) for y in range(min(ay, by), max(ay, by) + 1)}
-    elif ay == by:
-        return {(x, ay) for x in range(min(ax, bx), max(ax, bx) + 1)}
+    x_a, y_a = a
+    x_b, y_b = b
+    if x_a == x_b:
+        start, end = min(y_a, y_b), max(y_a, y_b)
+        return [(x_a, y) for y in range(start, end + 1)]
+    elif y_a == y_b:
+        start, end = min(x_a, x_b), max(x_a, x_b)
+        return [(x, y_a) for x in range(start, end + 1)]
     else:
         raise ValueError(f"a and b must be aligned in one of the axis: {a}, {b}")
 
 
-def parse_cave_canvas(path):
-    rock_points = set()
-    for line in open(path):
-        rock_segments = list(map(
-            lambda node: tuple(map(int, node.split(","))), 
-            line.strip().split(" -> ")
-        ))
-        for i in range(len(rock_segments) - 1):
-            rock_points.update(segment_to_points(*rock_segments[i : i+2]))
-    max_y = max([j for _, j in rock_points])
+def read_points_from_file(input_path: str) -> set[Point]:
+    """ Load and parse input file into a set of points. """
+    points = set()
+    for line in open(input_path):
+        segment_nodes = list(
+            map(
+                lambda node: tuple(map(int, node.split(","))), 
+                line.strip().split(" -> ")
+            )
+        )
+        for i in range(len(segment_nodes) - 1):
+            points.update(set(segment_to_points(*segment_nodes[i:i+2])))
+    return points
+
+
+def draw_cave_canvas(rock_points: set[Point], draw_floor: bool) -> Canvas:
+    """ 
+    Given a set of rock points, create a canvas (matrix) adding enough room 
+    for incoming sand.
+    """
+    max_x = max([x for x, _ in rock_points])
+    max_y = max([y for _, y in rock_points])
+    extra_room_x = 1000 if draw_floor else 0
+    extra_room_y = 2 if draw_floor else 0
     return [
         [
-            "#" if (x, y) in rock_points or y == max_y + 2 else "."
-            for x in range(max([i for i, _ in rock_points]) + 1000) 
+            ROCK if (x, y) in rock_points or (draw_floor and y == max_y + 2)
+            else AIR
+            for x in range(max_x + extra_room_x + 1)
         ]
-        for y in range(max_y + 2 + 1)
+        for y in range(max_y + extra_room_y + 1)
     ]
 
 
-def print_cave(cave, x_start=490):
+def print_cave(cave: Canvas, x_start=490, x_end=None):
     for j in range(len(cave)):
-        for i in range(x_start, len(cave[0])):
+        for i in range(x_start, x_end or len(cave[0])):
             print(cave[j][i], end="")
         print()
 
 
-def drop_sand_grain(cave, initial_pos=(500,0)):
-    i = initial_pos[0]
-    for j in range(initial_pos[1], len(cave)):
-        if cave[j][i] in ("#", "o"):
-            if cave[j][i-1] == ".":
-                return drop_sand_grain(cave, (i-1, j))
-            elif cave[j][i+1] == ".":
-                return drop_sand_grain(cave, (i+1, j))
+def drop_sand_grain(cave: Canvas, point: Point) -> bool:
+    """ 
+    Drop a grain of sand into the cave from a point. 
+    Returns True if the sand remains inside the canvas. 
+    """
+    x, y = point
+    for j in range(y, len(cave)):
+        if cave[j][x] in (ROCK, SAND):
+            if cave[j][x-1] == AIR:
+                return drop_sand_grain(cave, (x-1, j))
+            elif cave[j][x+1] == AIR:
+                return drop_sand_grain(cave, (x+1, j))
             else:
-                cave[j-1][i] = "o"
+                cave[j-1][x] = SAND
                 return True
     return False
 
 
-cave = parse_cave_canvas("input.txt")
+def count_dropped_sand(cave: Canvas) -> int:
+    """ 
+    Drop grain of sands from the hole until hole is covered 
+    or a grain fall off the canvas. 
+    """
+    sand_grains = 0
+    x_hole, y_hole = HOLE_POS
+    while cave[y_hole][x_hole] == AIR and drop_sand_grain(cave, HOLE_POS):
+        sand_grains += 1
+    return sand_grains
 
-grains = 0
-while cave[0][500] == "." and drop_sand_grain(cave):
-    grains += 1
 
-print_cave(cave, x_start=455)
+def part1(rock_points):
+    cave = draw_cave_canvas(rock_points, draw_floor=False)
+    print("Grains (no floor):", count_dropped_sand(cave))
 
-print("Grains:", grains)
+
+def part2(rock_points):
+    cave = draw_cave_canvas(rock_points, draw_floor=True)
+    print("Grains (yes floor):", count_dropped_sand(cave))
+
+
+rock_points = read_points_from_file("input.txt")
+part1(rock_points)
+part2(rock_points)
