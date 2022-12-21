@@ -41,8 +41,8 @@ def draw_cave_canvas(rock_points: set[Point], draw_floor: bool) -> Canvas:
     Given a set of rock points, create a canvas (matrix) adding enough room 
     for incoming sand.
     """
-    max_x = max([x for x, _ in rock_points])
-    max_y = max([y for _, y in rock_points])
+    max_x = max(x for x, _ in rock_points)
+    max_y = max(y for _, y in rock_points)
     extra_room_x = 1000 if draw_floor else 0
     extra_room_y = 2 if draw_floor else 0
     return [

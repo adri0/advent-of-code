@@ -37,11 +37,9 @@ def read_packet_pairs(input_path):
 
 def sum_pairs_in_order(packet_pairs):
     return sum(
-        [
-            i + 1
-            for i, (left, right) in enumerate(packet_pairs) 
-            if packets_in_order(left, right)
-        ]
+        i + 1
+        for i, (left, right) in enumerate(packet_pairs)
+        if packets_in_order(left, right)
     )
 
 
@@ -65,12 +63,12 @@ def sort_packets(packet_pairs):
 
 def prod_divider_indices(sorted_packets):
     return reduce(
-        mul, 
-        [
-            i + 1 
-            for i, packet in enumerate(sorted_packets) 
+        mul,
+        (
+            i + 1
+            for i, packet in enumerate(sorted_packets)
             if packet in DIVIDER_PACKETS
-        ]
+        )
     )
 
 
