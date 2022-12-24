@@ -1,4 +1,14 @@
+from functools import reduce
+from dataclasses import dataclass
+
 Point = tuple[int, int]
+
+
+@dataclass
+class Sensor:
+    pos: Point
+    beacon: Point
+    reach: int
 
 
 def parse_beacons_input(input_path) -> dict[Point, Point]:
@@ -9,9 +19,11 @@ def parse_beacons_input(input_path) -> dict[Point, Point]:
         y_s = int(part1[part1.find("y=")+2 :])
         x_b = int(part2[part2.find("x=")+2 : part2.find(",")])
         y_b = int(part2[part2.find("y=")+2 :])
-        sensors_to_beacon[(x_s, y_s)] = (x_b, y_b)
+        sensor = (x_s, y_s)
+        beacon = (x_b, y_b)
+        sensors_to_beacon[sensor] = beacon
     return sensors_to_beacon
-    
+
 
 def distance(a: Point, b: Point) -> int:
     x_a, y_a = a
@@ -26,24 +38,46 @@ def get_sensors_reach(sensors_to_beacon: dict[Point, Point]) -> dict[Point, int]
     }
 
 
-def is_covered(point, sensors_reach) -> bool:
-    for sensor, reach in sensors_reach.items():
-        if distance(sensor, point) <= reach:
-            return True
-    return False
+def coverage_in_row_by_sensor(y_row: int, sensor: Point, reach: int) -> set[Point]:
+    x_sensor = sensor[0]
+    mid_point = (x_sensor, y_row)
+    dist_mid_point = distance(sensor, mid_point)
+    if dist_mid_point > reach:
+        return set()
+    row_reach = reach - dist_mid_point 
+    return {
+        (x, y_row) 
+        for x in range(x_sensor - row_reach, x_sensor + row_reach + 1)
+    }
 
 
-sensors_to_beacon = parse_beacons_input("sample_input.txt")
-sensors_reach = get_sensors_reach(sensors_to_beacon)
+def count_points_covered_in_row(y_row, sensors_reach):
+    return len(
+        reduce(
+            lambda set1, set2: set1.union(set2), 
+            (
+                coverage_in_row_by_sensor(y_row, sensor, reach) 
+                for sensor, reach in sensors_reach.items()
+            )
+        )
+    )
 
 
-def count_positions_no_beacon(row, sensors_reach, beacons):
-    leftmost_pos = min([x_s - reach for (x_s, _), reach in sensors_reach.items()])
-    rightmost_pos = max([x_s + reach for (x_s, _), reach in sensors_reach.items()])
-    is_in_row = lambda point: point[0] == row 
-    return sum([
-        is_covered((x,row), sensors_reach) for x in range(leftmost_pos, rightmost_pos + 1)
-    ]) - len(set(filter(is_in_row, beacons))) - len(set(filter(is_in_row, sensors_reach.keys())))
-
-
-print(count_positions_no_beacon(row=10, sensors_reach=sensors_reach, beacons=set(sensors_to_beacon.values())))
+if __name__ == "__main__":
+    sensors_to_beacon = parse_beacons_input("input.txt")
+    sensors_reach = get_sensors_reach(sensors_to_beacon)
+    y_row = 2000000
+    # y_row = 10
+    cov_count_row = count_points_covered_in_row(
+        y_row=y_row, 
+        sensors_reach=sensors_reach
+    )
+    count_occupied = cov_count_row - len(
+        list(
+            filter(
+                lambda beacon: beacon[0] == y_row, 
+                set(sensors_to_beacon.keys())
+            )
+        )
+    )
+    print(count_occupied)
