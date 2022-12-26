@@ -1,6 +1,6 @@
 from functools import partial, reduce
-from operator import add, or_
-from typing import NamedTuple, Optional
+from operator import add
+from typing import NamedTuple
 
 from tqdm import tqdm
 
