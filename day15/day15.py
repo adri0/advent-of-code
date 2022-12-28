@@ -137,5 +137,5 @@ if __name__ == "__main__":
     # path_input, y_row, boundary = "sample_input.txt", 10, 20
     path_input, y_row, boundary = "input.txt", 2_000_000, 4_000_000
     sensors = parse_sensor_data(path_input)
-    # part1(sensors, y_row)
+    part1(sensors, y_row)
     part2(sensors, boundary)
