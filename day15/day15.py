@@ -17,6 +17,7 @@ class Sensor(NamedTuple):
 
 
 class Interval(NamedTuple):
+    """ Closed interval """
     left: int
     right: int
 
@@ -89,9 +90,9 @@ def subtract_interval(a: Interval, b: Interval) -> list[Interval]:
     Subtract from interval a all positions covered by interval b
     Result a list of intervals corresponding to remaining positions.
     """
-    if b.left > a.right or b.right < a.left:    # [..a..].[..b..]. -> ......[..a..]..
+    if b.left > a.right or b.right < a.left:    # [..b..].[..a..]. -> .......[..a..].
         return [a]                               
-    if b.left <= a.left and b.right >= a.right: # [..b..[..a..]..] -> ...............
+    if b.left <= a.left and b.right >= a.right: # [..b...[.a..]..] -> ...............
         return []
     if b.left > a.left and b.right < a.right:   # [..a...[.b..]..] -> [..a..].....[a]
         return [
@@ -107,18 +108,21 @@ def subtract_interval(a: Interval, b: Interval) -> list[Interval]:
 
 def find_uncovered_point(sensors: list[Sensor], boundary: int) -> Point:
     for y_row in tqdm(range(boundary)):
-        intervals_covered = map(partial(row_coverage_by_sensor, y_row), sensors)
-        intervals_covered = filter(None, intervals_covered)
-        intervals_remaining = [Interval(left=0, right=boundary)]
-        for sensor_cov in intervals_covered:
-            subtract_sensor_cov = partial(subtract_interval, b=sensor_cov)
-            subtracted_area = map(subtract_sensor_cov, intervals_remaining)
-            intervals_remaining = reduce(add, subtracted_area, [])
-        if intervals_remaining:
-            assert len(intervals_remaining) == 1
-            interval = intervals_remaining[0]
+        covered_intervals = map(partial(row_coverage_by_sensor, y_row), sensors)
+        covered_intervals = filter(None, covered_intervals)
+
+        uncovered = [Interval(left=0, right=boundary)]
+        for covered_interval in covered_intervals:
+            subtract_coverage = partial(subtract_interval, b=covered_interval)
+            uncovered = reduce(add, map(subtract_coverage, uncovered), [])
+            if len(uncovered) == 0:
+                break
+        else:
+            interval = uncovered[0]
+            assert len(uncovered) == 1
             assert interval.left == interval.right
             return Point(x=interval.left, y=y_row)
+
     raise Exception("No uncovered point found within boundary")
 
 
@@ -133,5 +137,5 @@ if __name__ == "__main__":
     # path_input, y_row, boundary = "sample_input.txt", 10, 20
     path_input, y_row, boundary = "input.txt", 2_000_000, 4_000_000
     sensors = parse_sensor_data(path_input)
-    part1(sensors, y_row)
+    # part1(sensors, y_row)
     part2(sensors, boundary)

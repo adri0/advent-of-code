@@ -1,22 +1,28 @@
-Point = tuple[int, int]
+from typing import NamedTuple
+
+
+class Point(NamedTuple):
+    x: int
+    y: int
+
+
 Canvas = list[list[Point]]
+
 
 AIR = "."
 ROCK = "#"
 SAND = "o"
-HOLE_POS = (500, 0)
+HOLE = Point(x=500, y=0)
 
 
 def segment_to_points(a: Point, b: Point) -> list[Point]:
     """ Create all points between a pair of points """
-    x_a, y_a = a
-    x_b, y_b = b
-    if x_a == x_b:
-        start, end = min(y_a, y_b), max(y_a, y_b)
-        return [(x_a, y) for y in range(start, end + 1)]
-    elif y_a == y_b:
-        start, end = min(x_a, x_b), max(x_a, x_b)
-        return [(x, y_a) for x in range(start, end + 1)]
+    if a.x == b.x:
+        start, end = min(a.y, b.y), max(a.y, b.y)
+        return [(a.x, y) for y in range(start, end + 1)]
+    elif a.y == b.y:
+        start, end = min(a.x, b.x), max(a.x, b.x)
+        return [(x, a.y) for x in range(start, end + 1)]
     else:
         raise ValueError(f"a and b must be aligned in one of the axis: {a}, {b}")
 
@@ -27,7 +33,7 @@ def read_points_from_file(input_path: str) -> set[Point]:
     for line in open(input_path):
         segment_nodes = list(
             map(
-                lambda node: tuple(map(int, node.split(","))), 
+                lambda node: Point(*map(int, node.split(","))), 
                 line.strip().split(" -> ")
             )
         )
@@ -67,15 +73,14 @@ def drop_sand_grain(cave: Canvas, point: Point) -> bool:
     Drop a grain of sand into the cave from a point. 
     Returns True if the sand remains inside the canvas. 
     """
-    x, y = point
-    for j in range(y, len(cave)):
-        if cave[j][x] in (ROCK, SAND):
-            if cave[j][x-1] == AIR:
-                return drop_sand_grain(cave, (x-1, j))
-            elif cave[j][x+1] == AIR:
-                return drop_sand_grain(cave, (x+1, j))
+    for j in range(point.y, len(cave)):
+        if cave[j][point.x] in (ROCK, SAND):
+            if cave[j][point.x - 1] == AIR:
+                return drop_sand_grain(cave, Point(point.x - 1, j))
+            elif cave[j][point.x + 1] == AIR:
+                return drop_sand_grain(cave, Point(point.x + 1, j))
             else:
-                cave[j-1][x] = SAND
+                cave[j - 1][point.x] = SAND
                 return True
     return False
 
@@ -86,22 +91,22 @@ def count_dropped_sand(cave: Canvas) -> int:
     or a grain fall off the canvas. 
     """
     sand_grains = 0
-    x_hole, y_hole = HOLE_POS
-    while cave[y_hole][x_hole] == AIR and drop_sand_grain(cave, HOLE_POS):
+    while cave[HOLE.y][HOLE.x] == AIR and drop_sand_grain(cave, HOLE):
         sand_grains += 1
     return sand_grains
 
 
-def part1(rock_points):
+def part1(rock_points: set[Point]) -> None:
     cave = draw_cave_canvas(rock_points, draw_floor=False)
     print("Grains (no floor):", count_dropped_sand(cave))
 
 
-def part2(rock_points):
+def part2(rock_points: set[Point]) -> None:
     cave = draw_cave_canvas(rock_points, draw_floor=True)
     print("Grains (yes floor):", count_dropped_sand(cave))
 
 
-rock_points = read_points_from_file("input.txt")
-part1(rock_points)
-part2(rock_points)
+if __name__ == "__main__":
+    rock_points = read_points_from_file("input.txt")
+    part1(rock_points)
+    part2(rock_points)

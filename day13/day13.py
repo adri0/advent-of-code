@@ -79,6 +79,7 @@ def part2(input_path):
     print("Product of divider packet indices:", result)
 
 
-input_path = "input.txt"
-part1(input_path)
-part2(input_path)
+if __name__ == "__main__":
+    input_path = "input.txt"
+    part1(input_path)
+    part2(input_path)
