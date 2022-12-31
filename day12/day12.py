@@ -76,7 +76,7 @@ def traverse(map_mat: Map) -> Generator[tuple[Coord, int], None, None]:
             yield Coord(i, j), elev
 
 
-def visualize(map_ap: Map, current_pos: Coord, visited: Iterable[Coord]) -> None:
+def visualize(map_mat: Map, current_pos: Coord, visited: Iterable[Coord]) -> None:
     for coord, elev in traverse(map_mat):
         if coord == current_pos:
             print(colorize("*"), end="")
