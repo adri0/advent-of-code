@@ -1,7 +1,7 @@
 class CRT:
     cycle = 1
     reg_x = 1
-    sig_strength_at_cycle = {cycle: None for cycle in [20, 60, 100, 140, 180, 220]}
+    sig_strength_at_cycle = {cycle: 0 for cycle in [20, 60, 100, 140, 180, 220]}
 
     def run_cycle(self):
         self.draw_pixel()
@@ -22,20 +22,24 @@ class CRT:
 
     def draw_pixel(self):
         crt_pos = (self.cycle - 1) % 40
-        sprint_range = (self.reg_x-1, self.reg_x, self.reg_x+1)
-        pixel = "#" if crt_pos in sprint_range else "."
+        sprite_range = (self.reg_x - 1, self.reg_x, self.reg_x + 1)
+        pixel = "#" if crt_pos in sprite_range else "."
         print(pixel, end="\n" if crt_pos == 39 else "")
 
 
-crt = CRT()
-for line in open("input.txt"):    
-    match line.strip().split():
-        case ["addx", arg]: 
-            crt.addx(int(arg))
-        case ["noop"]:
-            crt.noop()
-        case _:
-            raise Exception("Unrecognized input")
+def create_crt_from_input(path_input: str) -> CRT:
+    crt = CRT()
+    for line in open(path_input):
+        match line.strip().split():
+            case ["addx", arg]:
+                crt.addx(int(arg))
+            case ["noop"]:
+                crt.noop()
+            case _:
+                raise Exception("Unrecognized input")
+    return crt
 
 
-print("Sum inspected signal strengths:", sum(crt.sig_strength_at_cycle.values()))
+if __name__ == "__main__":
+    crt = create_crt_from_input("input.txt")
+    print("Sum inspected signal strengths:", sum(crt.sig_strength_at_cycle.values()))

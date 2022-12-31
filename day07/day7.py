@@ -1,9 +1,9 @@
 from collections import defaultdict
 
 
-def parse_directories_sizes(input_path):
-    cwd = [] 
-    directories = defaultdict(int)  # name -> size
+def parse_directories_sizes(input_path: str) -> dict[str, int]:
+    cwd: list[str] = []
+    directories: dict[str, int] = defaultdict(int)  # path -> size
     for terminal_out in open(input_path):
         match terminal_out.strip().split():
             case "$", "cd", "..":
@@ -12,7 +12,7 @@ def parse_directories_sizes(input_path):
                 cwd.append(dirname)
             case size, _ if size.isnumeric():
                 for i, dirname in enumerate(cwd):
-                    path = "/".join(cwd[:i+1])
+                    path = "/".join(cwd[: i + 1])
                     directories[path] += int(size)
             case ("$", *_) | ("dir", _):
                 pass
@@ -32,6 +32,7 @@ def dir_size_to_delete(directories):
     return min(filter(lambda size: size >= missing_space, directories.values()))
 
 
-directories = parse_directories_sizes("input.txt")
-print("Sum sizes:", sum_sizes(directories))
-print("Dir size to delete:", dir_size_to_delete(directories))
+if __name__ == "__main__":
+    directories = parse_directories_sizes("input.txt")
+    print("Sum sizes:", sum_sizes(directories))
+    print("Dir size to delete:", dir_size_to_delete(directories))

@@ -11,11 +11,10 @@ def find_n_diff_chars(input_stream, n_chars):
 
     return count
 
-result1 = find_n_diff_chars(open("input.txt"), 4)
-print(result1)
 
+if __name__ == "__main__":
+    result1 = find_n_diff_chars(open("input.txt"), 4)
+    print(result1)
 
-# -- Part 2 -- #
-
-result2 = find_n_diff_chars(open("input.txt"), 14)
-print(result2)
+    result2 = find_n_diff_chars(open("input.txt"), 14)
+    print(result2)
