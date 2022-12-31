@@ -123,7 +123,7 @@ def unroll_path(path_pos: PathPos) -> list[Coord]:
     return path
 
 
-def part1(map_mat: list[list[int]], start: Coord, end: Coord) -> None:
+def part1(map_mat: Map, start: Coord, end: Coord) -> None:
     """Print minimum number of steps from start to end"""
     path_pos = breadth_first_search(map_mat, start, end)
     if not path_pos:
@@ -134,7 +134,7 @@ def part1(map_mat: list[list[int]], start: Coord, end: Coord) -> None:
     print(f"Minimum number of steps from start at {start}:", n_steps)
 
 
-def part2(map_mat: list[list[int]], end: Coord) -> None:
+def part2(map_mat: Map, end: Coord) -> None:
     """Print minimum number of steps from any 'a' elevation to end"""
     elev_at_a = LETTERS.index("a")
     start = (coord for coord, elev in traverse(map_mat) if elev == elev_at_a)
