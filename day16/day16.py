@@ -22,16 +22,16 @@ def parse_valves(path: str) -> dict[str, Valve]:
         line = line.strip()
         code = line[len("Valve ") : line.find(" has")]
         rate = int(line[line.find("rate=") + 5 : line.find(";")])
-        adjacent_codes = re.findall(r"[A-Z]+", line[line.find(";"):])
+        adjacent_codes = re.findall(r"[A-Z]+", line[line.find(";") :])
         valves[code] = Valve(code, rate, adjacent_codes)
     for valve in valves.values():
-        valve.adjacent = list(map(valves.get, valve.adjacent))
+        valve.adjacent = list(map(valves.get, valve.adjacent))  # type: ignore
     return valves
 
 
-def pressure_released_in_minute(valves: list[Valve]) -> int:
-    """ Get pressure released on this minute.  """
-    return sum(valve.rate for valve in valves if valve.is_open)
+def pressure_released_in_minute(valves: dict[str, Valve]) -> int:
+    """Get pressure released on this minute."""
+    return sum(valve.rate for valve in valves.values() if valve.is_open)
 
 
 def do_action(valve: Valve) -> Valve:
@@ -43,8 +43,8 @@ def do_action(valve: Valve) -> Valve:
     return cur_valve
 
 
-def pressure_released(valves: list[Valve], starting_valve: str, minutes: int):
-    """ Get pressure released over minutes. """
+def pressure_released(valves: dict[str, Valve], starting_valve: str, minutes: int):
+    """Get pressure released over minutes."""
     pressure_released = 0
     cur_valve = valves[starting_valve]
     for _ in tqdm(range(minutes)):
@@ -53,17 +53,14 @@ def pressure_released(valves: list[Valve], starting_valve: str, minutes: int):
     return pressure_released
 
 
-def part1(valves: list[Valve]):
+def part1(valves: dict[str, Valve]):
     minutes = 30
     starting_valve = "AA"
     amount_press_released = pressure_released(
-        valves, 
-        starting_valve=starting_valve, 
-        minutes=minutes
+        valves, starting_valve=starting_valve, minutes=minutes
     )
     print(
-        f"Amount of pressure released during {minutes} minutes:", 
-        amount_press_released
+        f"Amount of pressure released during {minutes} minutes:", amount_press_released
     )
 
 
