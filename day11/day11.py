@@ -6,7 +6,7 @@ import operator
 @dataclass
 class Monkey:
     index: int
-    items: list[int] 
+    items: list[int]
     operation: callable
     divisor: int
     monkey_div_true: int
@@ -16,7 +16,7 @@ class Monkey:
 
     def next_monkey(self, item_worry) -> int:
         if item_worry % self.divisor == 0:
-            return self.monkey_div_true 
+            return self.monkey_div_true
         else:
             return self.monkey_div_false
 
@@ -30,25 +30,27 @@ class Monkey:
 
 
 def parse_operation(op_string):
-    """ Parse a string like 'new = old * 3' into a function """
+    """Parse a string like 'new = old * 3' into a function"""
     parts = op_string.split()
     num1 = int(parts[2]) if parts[2].isnumeric() else None
     num2 = int(parts[4]) if parts[4].isnumeric() else None
     op = {"*": operator.mul, "+": operator.add}[parts[3]]
+
     def operation(old):
         return op(num1 or old, num2 or old)
+
     return operation
 
 
-def parse_monkey_str(monkey_as_str) -> Monkey:
-    lines = list(map(lambda s: s.strip(), monkey_as_str.split("\n")))
+def parse_monkey_str(monkey_as_str: str) -> Monkey:
+    lines = [line.strip() for line in monkey_as_str.split("\n")]
     return Monkey(
         index=int(lines[0][len("Monkey ") : -1]),
-        items=list(map(int, lines[1][len("Starting items: "):].split(", "))),
-        operation=parse_operation(lines[2][len("Operation: "):]),
-        divisor=int(lines[3][len("Test: divisable by "):]),
-        monkey_div_true=int(lines[4][len("If true: throw to monkey "):]),
-        monkey_div_false=int(lines[5][len("If false: throw to monkey "):])
+        items=list(map(int, lines[1][len("Starting items: ") :].split(", "))),
+        operation=parse_operation(lines[2][len("Operation: ") :]),
+        divisor=int(lines[3][len("Test: divisable by ") :]),
+        monkey_div_true=int(lines[4][len("If true: throw to monkey ") :]),
+        monkey_div_false=int(lines[5][len("If false: throw to monkey ") :]),
     )
 
 
@@ -61,7 +63,7 @@ def do_round(monkeys: list[Monkey]):
 def monkey_biz(monkeys, n_rounds):
     for _ in range(n_rounds):
         do_round(monkeys)
-    i1, i2 = sorted(map(lambda m: m.inspection_count, monkeys))[-2:]
+    i1, i2 = sorted(monkey.inspection_count for monkey in monkeys)[-2:]
     return i1 * i2
 
 
@@ -69,8 +71,7 @@ def get_monkeys(input_path="input.txt"):
     input_str = open(input_path).read()
     monkeys = list(map(parse_monkey_str, input_str.split("\n\n")))
     Monkey.common_divisor = reduce(
-        operator.mul, 
-        set(map(lambda m: m.divisor, monkeys))
+        operator.mul, set(monkey.divisor for monkey in monkeys)
     )
     return monkeys
 

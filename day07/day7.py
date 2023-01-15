@@ -22,14 +22,14 @@ def parse_directories_sizes(input_path: str) -> dict[str, int]:
 
 
 def sum_sizes(directories):
-    return sum(filter(lambda size: size <= 100_000, directories.values()))
+    return sum(size for size in directories.values() if size <= 100_000)
 
 
 def dir_size_to_delete(directories):
     occupied = directories["/"]
     free_space = 70_000_000 - occupied
     missing_space = 30_000_000 - free_space
-    return min(filter(lambda size: size >= missing_space, directories.values()))
+    return min(size for size in directories.values() if size >= missing_space)
 
 
 if __name__ == "__main__":

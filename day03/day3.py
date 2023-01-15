@@ -11,8 +11,8 @@ def priority(item):
 
 
 def find_dup_item(rucksack):
-    comp_1 = rucksack[:len(rucksack)//2]
-    comp_2 = rucksack[len(rucksack)//2:]
+    comp_1 = rucksack[: len(rucksack) // 2]
+    comp_2 = rucksack[len(rucksack) // 2 :]
     return set(comp_1).intersection(set(comp_2)).pop()
 
 
@@ -21,10 +21,12 @@ print(result1)
 
 
 # -- Part 2 -- #
-groups = [input_list[i:i+3] for i in range(0, len(input_list), 3)]
+groups = [input_list[i : i + 3] for i in range(0, len(input_list), 3)]
+
 
 def find_common_item(rucksacks):
-    return reduce(lambda a, b: a.intersection(b), map(set, rucksacks)).pop()
+    return reduce(set.intersection, map(set, rucksacks)).pop()
+
 
 result2 = sum(map(priority, map(find_common_item, groups)))
 print(result2)

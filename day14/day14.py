@@ -31,12 +31,9 @@ def read_points_from_file(input_path: str) -> set[Point]:
     """Load and parse input file into a set of points."""
     points = set()
     for line in open(input_path):
-        segment_nodes = list(
-            map(
-                lambda node: Point(*map(int, node.split(","))),
-                line.strip().split(" -> "),
-            )
-        )
+        segment_nodes = [
+            Point(*map(int, node.split(","))) for node in line.strip().split(" -> ")
+        ]
         for i in range(len(segment_nodes) - 1):
             points.update(set(segment_to_points(*segment_nodes[i : i + 2])))
     return points

@@ -69,14 +69,8 @@ def points_covered_in_row(y_row: int, sensors: list[Sensor]) -> set[Point]:
 
 def part1(sensors: list[Sensor], y_row: int) -> None:
     cov_count_row = len(points_covered_in_row(y_row, sensors))
-    count_not_beacon = cov_count_row - len(
-        set(
-            filter(
-                lambda beacon: beacon.y == y_row,
-                map(lambda sensor: sensor.beacon, sensors),
-            )
-        )
-    )
+    beacons_row = set(sensor.beacon for sensor in sensors if sensor.beacon.y == y_row)
+    count_not_beacon = cov_count_row - len(beacons_row)
     print(f"Number of pos beacon can't be in in row {y_row}:", count_not_beacon)
 
 

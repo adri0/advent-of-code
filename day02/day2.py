@@ -14,32 +14,26 @@ code_to_sign = {
     "C": SCISSORS,
     "X": ROCK,
     "Y": PAPER,
-    "Z": SCISSORS
+    "Z": SCISSORS,
 }
 
 
 def sign_to_points(sign):
-    return {
-        ROCK: 1,
-        PAPER: 2,
-        SCISSORS: 3
-    }[sign]
+    return {ROCK: 1, PAPER: 2, SCISSORS: 3}[sign]
 
 
 def result_to_points(game_result):
-    return {
-        WIN: 6,
-        DRAW: 3,
-        LOSE: 0
-    }[game_result]
+    return {WIN: 6, DRAW: 3, LOSE: 0}[game_result]
 
 
 def get_game_result(opponent, mine):
     if mine == opponent:
         return DRAW
-    elif (mine == PAPER and opponent == ROCK) \
-        or (mine == SCISSORS and opponent == PAPER) \
-        or (mine == ROCK and opponent == SCISSORS):
+    elif (
+        (mine == PAPER and opponent == ROCK)
+        or (mine == SCISSORS and opponent == PAPER)
+        or (mine == ROCK and opponent == SCISSORS)
+    ):
         return WIN
     else:
         return LOSE
@@ -47,12 +41,12 @@ def get_game_result(opponent, mine):
 
 def points_obtained(opponent, mine):
     opponent_sign = code_to_sign[opponent]
-    my_sign = code_to_sign[mine]    
+    my_sign = code_to_sign[mine]
     result = get_game_result(opponent_sign, my_sign)
     return sign_to_points(my_sign) + result_to_points(result)
-    
 
-result1 = sum(map(lambda codes: points_obtained(codes[0], codes[1]), input_list))
+
+result1 = sum(points_obtained(codes[0], codes[1]) for codes in input_list)
 print(result1)
 
 
@@ -78,5 +72,5 @@ def points_obtained(opponent_sign, game_result):
     return sign_to_points(my_sign) + result_to_points(game_result)
 
 
-result2 = sum(map(lambda codes: points_obtained(codes[0], codes[1]), input_list))
+result2 = sum(points_obtained(codes[0], codes[1]) for codes in input_list)
 print(result2)

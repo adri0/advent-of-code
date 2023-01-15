@@ -24,9 +24,9 @@ def tree_is_visible(trees_mat, i_tree, j_tree):
         if trees_mat[j][i_tree] >= tree_height:
             invisible_directions += 1
             break
-        
+
     return invisible_directions < 4
-    
+
 
 def count_visible_trees(trees_mat: list[list[int]]) -> int:
     n_visible = 0
@@ -62,7 +62,7 @@ def scenic_score(trees_mat, i_tree, j_tree):
         scenic_factors[3] += 1
         if trees_mat[j][i_tree] >= tree_height:
             break
-        
+
     return reduce(lambda a, b: a * b, scenic_factors)
 
 

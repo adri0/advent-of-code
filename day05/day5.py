@@ -44,7 +44,7 @@ def apply_moves(stacks: Stacks, moves: list[str], move_func: Callable) -> None:
 
 
 def get_stack_tops(stacks: Stacks):
-    return "".join(map(lambda s: s[-1], stacks[1:]))
+    return "".join(stack[-1] for stack in stacks[1:])
 
 
 def part1(moves: list[str]) -> None:
