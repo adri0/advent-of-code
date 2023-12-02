@@ -1,3 +1,4 @@
 *.pyc
-day*/*.txt
+20**/*.txt
 .vscode
+.mypy_cache
