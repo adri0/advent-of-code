@@ -28,7 +28,8 @@ def read_schematic_from_file(path: str) -> Schematic:
 def read_coords_from_line(line: str, line_number: int) -> Schematic:
     """Line example: 467..114.."""
     coords = {}
-    for match in re.finditer(r"\d+|[^.\d\n]{1}", line):
+    # Match sequence of digits or single chars that aren't digit nor dot.
+    for match in re.finditer(r"\d+|[^.\d]{1}", line.strip()):
         content = match.group()
         element = Element(
             content=int(content) if content.isnumeric() else content,
@@ -60,16 +61,16 @@ def get_adjacent_number_elements(symbol: Element, schematic: Schematic) -> set[E
     return adjacent
 
 
-def get_gear_ratios(
-    elements: list[Element], schematic: Schematic
+def get_gears_ratios(
+    symbols: list[Element], schematic: Schematic
 ) -> list[tuple[Element, int]]:
-    gears = []
-    for element in elements:
-        adjacent = get_adjacent_number_elements(element, schematic)
-        if len(adjacent) == 2:
-            adj1, adj2 = adjacent
-            gears.append((element, int(adj1.content) * int(adj2.content)))
-    return gears
+    gears_ratios = []
+    for element in symbols:
+        adjacent_elements = get_adjacent_number_elements(element, schematic)
+        if len(adjacent_elements) == 2:
+            adj1, adj2 = adjacent_elements
+            gears_ratios.append((element, int(adj1.content) * int(adj2.content)))
+    return gears_ratios
 
 
 def part1(schematic: Schematic, symbols: list[Element]) -> None:
@@ -82,7 +83,7 @@ def part1(schematic: Schematic, symbols: list[Element]) -> None:
 
 
 def part2(schematic: Schematic, symbols: list[Element]) -> None:
-    gears_ratios = get_gear_ratios(symbols, schematic)
+    gears_ratios = get_gears_ratios(symbols, schematic)
     gear_ratio_sum = sum(ratio for gear, ratio in gears_ratios)
     print("Sum of gears ratios:", gear_ratio_sum)
 
