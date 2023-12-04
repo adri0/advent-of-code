@@ -1,6 +1,6 @@
 import re
 from functools import partial, reduce
-from typing import Iterable, NamedTuple
+from typing import NamedTuple
 
 
 class Coord(NamedTuple):
