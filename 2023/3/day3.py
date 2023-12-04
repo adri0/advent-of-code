@@ -38,10 +38,6 @@ def read_coords_from_line(line: str, line_number: int) -> Schematic:
     return coords
 
 
-def filter_symbols(elements: Iterable[Element]) -> list[Element]:
-    return [element for element in elements if not element.content.isnumeric()]
-
-
 def get_adjacent_number_elements(symbol: Element, schematic: Schematic) -> set[Element]:
     symbol_coord = symbol.coords[0]
     adjacent_coords = [
@@ -60,16 +56,6 @@ def get_adjacent_number_elements(symbol: Element, schematic: Schematic) -> set[E
     return adjacent
 
 
-def get_gears_ratios(symbols: list[Element], schematic: Schematic) -> list[int]:
-    gears_ratios = []
-    for element in symbols:
-        adjacent_elements = get_adjacent_number_elements(element, schematic)
-        if len(adjacent_elements) == 2:
-            adj1, adj2 = adjacent_elements
-            gears_ratios.append(int(adj1.content) * int(adj2.content))
-    return gears_ratios
-
-
 def part1(schematic: Schematic, symbols: list[Element]) -> None:
     part_numbers = reduce(
         set.union,
@@ -80,12 +66,17 @@ def part1(schematic: Schematic, symbols: list[Element]) -> None:
 
 
 def part2(schematic: Schematic, symbols: list[Element]) -> None:
-    gears_ratios = get_gears_ratios(symbols, schematic)
+    gears_ratios = []
+    for element in symbols:
+        adjacent_elements = get_adjacent_number_elements(element, schematic)
+        if len(adjacent_elements) == 2:
+            adj1, adj2 = adjacent_elements
+            gears_ratios.append(int(adj1.content) * int(adj2.content))
     print("Sum of gears ratios:", sum(gears_ratios))
 
 
 if __name__ == "__main__":
     schematic = read_schematic_from_file("example.txt")
-    symbols = filter_symbols(schematic.values())
+    symbols = [elem for elem in schematic.values() if not elem.content.isnumeric()]
     part1(schematic, symbols)
     part2(schematic, symbols)
