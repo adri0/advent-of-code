@@ -13,9 +13,9 @@ def read_scores(input_path: str) -> list[Race]:
     with open(input_path) as f:
         lines = f.readlines()
     times, dists = (
-        list(map(int, lines[i].split(":")[1].strip().split())) for i in (0, 1)
+        int("".join(lines[i].split(":")[1].strip().split())) for i in (0, 1)
     )
-    return list(Race(times[i], dists[i]) for i in range(len(times)))
+    return [Race(times, dists)]
 
 
 # pt: press time
