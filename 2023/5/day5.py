@@ -58,10 +58,7 @@ def map_ranges(in_ranges: list[range], map_: Map) -> list[range]:
     for i, map_range in enumerate(map_.source_ranges):
         offset = map_.dest_offsets[i]
         ranges_left = []
-        for in_range in list(in_ranges):
-            if len(in_range) == 0:
-                continue
-
+        for in_range in in_ranges:
             if in_range.start in map_range and (in_range.stop - 1) in map_range:
                 out_ranges.append(
                     range(in_range.start + offset, in_range.stop + offset)
@@ -96,19 +93,14 @@ def map_ranges(in_ranges: list[range], map_: Map) -> list[range]:
 
 
 def find_seed_range_locations(seed_range: range, maps: list[Map]) -> list[range]:
-    in_ranges = [seed_range]
-    out_ranges = []
+    out_ranges = [seed_range]
     for map_ in maps:
-        # range(1514493331, 1809744264)
-        out_ranges = map_ranges(in_ranges, map_)
-        in_ranges = list(out_ranges)
+        out_ranges = map_ranges(out_ranges, map_)
     return out_ranges
 
 
 def part1(seeds: list[int], maps: list[Map]) -> None:
-    # min_loc = min(find_seed_location(seed, maps) for seed in seeds)
-    locs = (find_seed_range_locations(range(s, s + 1), maps) for s in seeds)
-    min_loc = min(range_.start for range_ in chain.from_iterable(locs))
+    min_loc = min(find_seed_location(seed, maps) for seed in seeds)
     print("Min location (part 1)", min_loc)
 
 
