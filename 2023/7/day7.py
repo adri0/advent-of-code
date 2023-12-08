@@ -21,16 +21,23 @@ class Hand(NamedTuple):
     type: HandType
 
 
-def read_hands(input_path: str) -> list[Hand]:
+def read_hands(input_path: str, joker: bool = False) -> list[Hand]:
     with open(input_path) as f:
         return [
-            Hand(cards, int(bid), hand_type(cards))
+            Hand(cards, int(bid), hand_type(cards, joker))
             for cards, bid in (line.strip().split() for line in f.readlines())
         ]
 
 
-def hand_type(cards: str) -> HandType:
-    match sorted(Counter(cards).values()):
+def hand_type(cards: str, joker: bool = False) -> HandType:
+    counter = Counter(cards)
+    if joker and "J" in counter and len(counter) > 1:
+        sorted_counter = sorted(counter.items(), key=lambda i: i[1], reverse=True)
+        most_freq = sorted_counter[0][0]
+        card_transfer = most_freq if most_freq != "J" else sorted_counter[1][0]
+        counter[card_transfer] += counter["J"]
+        del counter["J"]
+    match sorted(counter.values()):
         case [5]:
             return HandType.FIVE_OAK
         case [1, 4]:
@@ -49,16 +56,29 @@ def hand_type(cards: str) -> HandType:
             raise ValueError("Something's wrong")
 
 
-def hand_strength(hand: Hand) -> list[int]:
-    return [hand.type.value, *map(CARD_STRENGTH.index, hand.cards)]
+def hand_strength(hand: Hand, strengths=CARD_STRENGTH) -> list[int]:
+    return [hand.type.value, *map(strengths.index, hand.cards)]
 
 
-def part1(hands: list[Hand]) -> None:
+def part1(input_path: str) -> None:
+    hands = read_hands(input_path)
     ranked_hands = sorted(hands, key=hand_strength)
     winnings = (hand.bid * rank for rank, hand in enumerate(ranked_hands, start=1))
-    print("Sum of winnings:", sum(winnings))
+    print("Sum of winnings (Part 1):", sum(winnings))
+
+
+def part2(input_path: str) -> None:
+    card_strength = list(CARD_STRENGTH)
+    card_strength.remove("J")
+    card_strength.insert(0, "J")
+
+    hands = read_hands(input_path, joker=True)
+    ranked_hands = sorted(hands, key=lambda hand: hand_strength(hand, card_strength))
+    winnings = (hand.bid * rank for rank, hand in enumerate(ranked_hands, start=1))
+    print("Sum of winnings (Part 2):", sum(winnings))
 
 
 if __name__ == "__main__":
-    hands = read_hands("input.txt")
-    part1(hands)
+    input_path = "input.txt"
+    part1(input_path)
+    part2(input_path)
