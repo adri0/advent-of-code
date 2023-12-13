@@ -2,3 +2,4 @@
 20**/*.txt
 .vscode
 .mypy_cache
+!requirements.txt
