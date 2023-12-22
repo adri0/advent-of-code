@@ -3,48 +3,48 @@ def read_mirrors(input_path: str) -> list[list[str]]:
         return [block.split() for block in f.read().strip().split("\n\n")]
 
 
-def rows_up_reflection(block: list[str], sumdge_fix: bool = False) -> int:
-    # Find reflection (there might be more than 1)
-    for line in range(len(block) - 1):
-        smudge_fixed = not sumdge_fix
+def nrows_up_of_reflection(block: list[str], fix_smudge: bool = False) -> int:
+    # Find reflection line index
+    for i_line in range(len(block) - 1):
+        smudge_fixed = not fix_smudge
 
-        # if not smudge_fixed and :
-        if block[line] != block[line + 1]:  # Not a possible reflection
+        if not smudge_fixed and diff(block[i_line], block[i_line + 1]) == 1:
+            smudge_fixed = True
+        elif block[i_line] != block[i_line + 1]:  # Not a possible reflection
             continue
-        # elif not smudge_fixed and
 
         # iterate from the reflection
-        refl_i = line  # backward
-        refl_j = line + 1  # forward
-        while 0 <= refl_i and refl_j < len(block):
-            if block[refl_i] != block[refl_j]:
+        i_back = i_line - 1  # backward
+        i_forw = i_line + 2  # forward
+        while 0 <= i_back and i_forw < len(block):
+            if not smudge_fixed and diff(block[i_back], block[i_forw]) == 1:
+                smudge_fixed = True
+            elif block[i_back] != block[i_forw]:
                 break
 
-            refl_i -= 1
-            refl_j += 1
+            i_back -= 1
+            i_forw += 1
         else:
-            return line + 1  # Didn't break thus valid reflection
-
+            if not fix_smudge or smudge_fixed:
+                return i_line + 1  # Valid reflection
     return 0
 
 
-def cols_left_reflection(block: list[str], sumdge_fix: bool = False) -> int:
+def ncols_left_of_reflection(block: list[str], fix_smudge: bool = False) -> int:
     block_transposed = [
         "".join(block[i_row][i_col] for i_row in range(len(block)))
         for i_col in range(len(block[0]))
     ]
-    return rows_up_reflection(block_transposed, sumdge_fix=sumdge_fix)
+    return nrows_up_of_reflection(block_transposed, fix_smudge=fix_smudge)
 
 
 def diff(str1: str, str2: str) -> int:
-    if len(str1) != len(str2):
-        raise ValueError("Length must be the same")
     return sum(1 for i in range(len(str1)) if str1[i] != str2[i])
 
 
 def part1(mirrors: list[list[str]]) -> None:
     res = sum(
-        cols_left_reflection(block) + 100 * rows_up_reflection(block)
+        ncols_left_of_reflection(block) + 100 * nrows_up_of_reflection(block)
         for block in mirrors
     )
     print("(Part 1) Result:", res)
@@ -52,8 +52,8 @@ def part1(mirrors: list[list[str]]) -> None:
 
 def part2(mirrors: list[list[str]]) -> None:
     res = sum(
-        cols_left_reflection(block, sumdge_fix=True)
-        + 100 * rows_up_reflection(block, sumdge_fix=True)
+        ncols_left_of_reflection(block, fix_smudge=True)
+        + 100 * nrows_up_of_reflection(block, fix_smudge=True)
         for block in mirrors
     )
     print("(Part 2) Result:", res)
@@ -62,4 +62,4 @@ def part2(mirrors: list[list[str]]) -> None:
 if __name__ == "__main__":
     mirrors = read_mirrors("input.txt")
     part1(mirrors)
-    # part2(mirrors)
+    part2(mirrors)
