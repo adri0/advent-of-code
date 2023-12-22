@@ -5,17 +5,17 @@ def read_mirrors(input_path: str) -> list[list[str]]:
 
 def nrows_up_of_reflection(block: list[str], fix_smudge: bool = False) -> int:
     # Find reflection line index
-    for i_line in range(len(block) - 1):
+    for line in range(len(block) - 1):
         smudge_fixed = not fix_smudge
 
-        if not smudge_fixed and diff(block[i_line], block[i_line + 1]) == 1:
+        if not smudge_fixed and diff(block[line], block[line + 1]) == 1:
             smudge_fixed = True
-        elif block[i_line] != block[i_line + 1]:  # Not a possible reflection
+        elif block[line] != block[line + 1]:  # Not a possible reflection
             continue
 
         # iterate from the reflection
-        i_back = i_line - 1  # backward
-        i_forw = i_line + 2  # forward
+        i_back = line - 1  # backward
+        i_forw = line + 2  # forward
         while 0 <= i_back and i_forw < len(block):
             if not smudge_fixed and diff(block[i_back], block[i_forw]) == 1:
                 smudge_fixed = True
@@ -26,7 +26,7 @@ def nrows_up_of_reflection(block: list[str], fix_smudge: bool = False) -> int:
             i_forw += 1
         else:
             if not fix_smudge or smudge_fixed:
-                return i_line + 1  # Valid reflection
+                return line + 1  # Valid reflection
     return 0
 
 
