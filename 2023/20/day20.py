@@ -1,4 +1,6 @@
+import math
 from abc import ABC, abstractmethod
+from collections import defaultdict
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import NamedTuple, cast
@@ -44,11 +46,14 @@ class FlipFlop(Module):
             return self.generate_pulses(out_intensity)
 
 
-@dataclass
 class Conjunction(Module):
-    memory: dict[str, Intensity] = field(default_factory=dict)
+    def __init__(self, name: str, out_connections: list[str]) -> None:
+        super().__init__(name, out_connections)
+        self.memory: dict[str, Intensity] = {}
+        self.prev_memory: dict[str, Intensity] = {}
 
     def receive_pulse(self, pulse: Pulse) -> list[Pulse]:
+        self.prev_memory[pulse.source] = self.memory[pulse.source]
         self.memory[pulse.source] = pulse.intensity
         out_intensity = (
             Intensity.LOW
@@ -117,6 +122,50 @@ def part1(modules: dict[str, Module]) -> None:
     print("(Part 1) Result:", lows * highs)
 
 
+def part2(modules: dict[str, Module]) -> None:
+    n_button_press = 0
+    pulse_found = False
+    kh = cast(Conjunction, modules["kh"])
+    pulses_per_kh_con = {mod: defaultdict(list) for mod in kh.memory}
+
+    while not pulse_found:
+        n_button_press += 1
+        pulses = [Pulse(source="button", target="broadcaster", intensity=Intensity.LOW)]
+        n_pulses = 0
+        while pulses:
+            n_pulses += 1
+            pulse = pulses.pop()
+            if pulse.target == "rx" and pulse.intensity == Intensity.LOW:
+                pulse_found = True
+                break
+            out_pulses = modules[pulse.target].receive_pulse(pulse)
+            pulses = out_pulses + pulses
+
+            # if pulse.target == "rx":
+            #     for mod, i in kh.memory.items():
+            #         if i == Intensity.HIGH:
+            #             pulses_per_kh_con[mod][n_button_press].append(n_pulses)
+
+        for mod, i in kh.memory.items():
+            if i == Intensity.HIGH:
+                print("npress", n_button_press, kh)
+        # if len(pulses_per_kh_con[]):
+        #     print(pulses_per_kh_con)
+        #     # print(pulses_per_press)
+        #     pulse_found = True
+        #     break
+        #     pulses_per_kh_con[pulse.source].append(n_pulses)
+        # if len(pulses_per_kh_con["hz"]) == 8:
+
+    lcm = math.lcm(*pulses_per_kh_con.values())
+    print("lcm:", lcm)
+    print("per button", (lcm // 60) // 42)
+
+    print("(Part 2) Result:", n_button_press)
+
+
 if __name__ == "__main__":
+    # modules = read_modules("input.txt")
+    # part1(modules)
     modules = read_modules("input.txt")
-    part1(modules)
+    part2(modules)
