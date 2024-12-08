@@ -30,30 +30,28 @@ def part1(rules: Rules, updates: list[Update]) -> int:
 def is_correctly_ordered(update: Update, rules: Rules) -> bool:
     seen: set[int] = set()
     for page_num in update:
-        prevs = rules[page_num]
-        if seen & prevs:
+        if seen & rules[page_num]:
             return False
         seen.add(page_num)
     return True
-
-
-class SortablePage:
-    def __init__(self, num: int, rules: Rules):
-        super().__init__()
-        self.num = num
-        self.rules = rules
-
-    def __lt__(self, other: "SortablePage") -> bool:
-        return other.num in self.rules[self.num]
 
 
 def part2(rules: Rules, updates: list[Update]) -> int:
     mid_sum = 0
     for update in updates:
         if not is_correctly_ordered(update, rules):
-            corrected_update = sorted(update, key=partial(SortablePage, rules=rules))
-            mid_sum += corrected_update[len(corrected_update) // 2]
+            sorted_update = sorted(update, key=partial(SortablePage, rules=rules))
+            mid_sum += sorted_update[len(sorted_update) // 2]
     return mid_sum
+
+
+class SortablePage:
+    def __init__(self, num: int, rules: Rules):
+        self.num = num
+        self.rules = rules
+
+    def __lt__(self, other: "SortablePage") -> bool:
+        return other.num in self.rules[self.num]
 
 
 if __name__ == "__main__":
