@@ -1,6 +1,6 @@
 with open("input.txt") as f:
     dial_pos = 50
-    n_zero = 0
+    n_zeros = 0
 
     for line in f:
         signal = {"L": -1, "R": +1}[line[0]]
@@ -14,9 +14,9 @@ with open("input.txt") as f:
 
         zero_crossings += abs(line_pos) // 100
 
-        n_zero += zero_crossings
+        n_zeros += zero_crossings
         print(f"{dial_pos=}\t{line_pos=}\t{dial_pos_after=}\t{zero_crossings=}")
 
         dial_pos = dial_pos_after
 
-    print(f"{n_zero=}")
+    print(f"{n_zeros=}")
