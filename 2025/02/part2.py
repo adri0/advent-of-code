@@ -1,16 +1,16 @@
-from typing import Generator
+from typing import Iterator
 
 
-def generate_char_seqs(string: str) -> Generator[list[str], None, None]:
-    """Generate string slices of length n. Start n=1 until n=len(id)"""
+def slice_string(string: str) -> Iterator[list[str]]:
+    """Generate string slices of length n. Start n=1 until n=len(string)-1"""
     for n in range(1, len(string)):
         if len(string) % n != 0:
             # Skip non divisable n
             continue
 
         slices = []
-        n_slices = len(string) // n
-        for i in range(n_slices):
+        num_slices = len(string) // n
+        for i in range(num_slices):
             slice = string[n * i : n * (i + 1)]
             slices.append(slice)
 
@@ -25,8 +25,8 @@ with open("input.txt") as f:
         start, end = range_.split("-")
         for id_ in range(int(start), int(end) + 1):
             id = str(id_)
-            for char_seqs in generate_char_seqs(id):
-                if len(char_seqs) > 1 and len(set(char_seqs)) == 1:
+            for slices in slice_string(id):
+                if len(slices) > 1 and len(set(slices)) == 1:
                     sum_invalid += id_
                     break
 
