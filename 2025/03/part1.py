@@ -11,8 +11,7 @@ with open("input.txt") as f:
                 first_highest = int(value)
                 i_highest = i
 
-        second_highest = int(max(bank[i_highest + 1 :]))
-
+        second_highest = max(bank[i_highest + 1 :])
         total_joltage += int(f"{first_highest}{second_highest}")
 
     print(f"{total_joltage=}")
