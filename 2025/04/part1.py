@@ -5,25 +5,15 @@ with open("input.txt") as f:
     grid = extra_row + grid + extra_row
 
 accessible_rolls = 0
+adjacent_steps = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
 
 for i in range(len(grid)):
     for j in range(len(grid[0])):
         if grid[i][j] != "@":
             continue
 
-        shifts = [
-            (-1, -1),
-            (-1, 0),
-            (-1, 1),
-            (0, -1),  # Skip 0, 0 shift
-            (0, 1),
-            (1, -1),
-            (1, 0),
-            (1, 1),
-        ]
-
         adjacent_rolls = 0
-        for si, sj in shifts:
+        for si, sj in adjacent_steps:
             if grid[i + si][j + sj] == "@":
                 adjacent_rolls += 1
 
