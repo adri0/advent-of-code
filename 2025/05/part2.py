@@ -22,19 +22,25 @@ with open("input.txt") as f:
     ranges_, _ = f.read().strip().split("\n\n")
     ranges_input = [Range(*map(int, range_.split("-"))) for range_ in ranges_.split()]
 
-ranges_non_overlapping: set[Range] = set()
+non_overlapping: set[Range] = set()
 
 while ranges_input:
     range_i = ranges_input.pop()
-    for range_n_o in ranges_non_overlapping:
+    for range_n_o in non_overlapping:
         if overlap(range_i, range_n_o):
             range_merged = merge(range_i, range_n_o)
-            ranges_non_overlapping.remove(range_n_o)
+
+            # Remove the previous range_n_o in favour of range_merged
+            non_overlapping.remove(range_n_o)
+
+            # Put the newly created range back into the input queue
+            # as it might overlap with other ranges in non_overlapping
             ranges_input.append(range_merged)
             break
     else:
-        ranges_non_overlapping.add(range_i)
+        # No break triggered/overlap found, thus safe to add to non_overlapping
+        non_overlapping.add(range_i)
 
-count_ids = sum(end - start + 1 for start, end in ranges_non_overlapping)
+count_ids = sum(end - start + 1 for start, end in non_overlapping)
 
 print(f"{count_ids=}")
