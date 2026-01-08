@@ -14,6 +14,6 @@ for i in range(1, len(grid)):
             else:
                 grid[i][j] += previous
 
-timelines = sum(v for v in grid[-1] if isinstance(v, int))
+timelines = sum(x for x in grid[-1] if isinstance(x, int))
 
 print(f"{timelines=}")
