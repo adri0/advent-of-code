@@ -5,7 +5,8 @@ V = [v0 ... vk]   -> target joltage per counter
 N = [n0 ... nm]   -> number of presses per button
 B = [b00 ... b0k] -> joltage addition per button per counter (binary matrix)
     [b10 ... b1k]
-    [bm0 ... bjk]
+    [    ...    ]
+    [bm0 ... bmk]
 
 k: number of joltage counters
 m: number of buttons
@@ -24,20 +25,17 @@ with open("input.txt") as f:
         machines.append((target, buttons))
 
 total_presses = 0
-
 for target, buttons in machines:
     k = len(target)
     m = len(buttons)
 
     V = target
     B = [[int(j in buttons[i]) for j in range(k)] for i in range(m)]
-
     N = [LpVariable(f"N_{i}", lowBound=0, cat="Integer") for i in range(m)]
 
     prob = LpProblem("Minimize_sum(N)", LpMinimize)
     prob += sum(N)
 
-    # Constraints
     for i in range(k):
         prob += V[i] == sum(N[j] * B[j][i] for j in range(m))
 

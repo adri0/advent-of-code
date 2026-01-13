@@ -22,7 +22,7 @@ for target, buttons in machines:
                 min_pushes += n_pushes
                 break
         else:
-            # Unable to find in n_push
+            # Unable to find in n_pushes
             continue
         break
     else:
