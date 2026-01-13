@@ -4,23 +4,21 @@ with open("input.txt") as f:
     machines = []
     for line in f:
         indicator_str, *buttons_str, _ = line.split()
-        goal_state: list[bool] = [
-            {".": False, "#": True}[c] for c in indicator_str[1:-1]
-        ]
+        target: list[bool] = [{".": False, "#": True}[c] for c in indicator_str[1:-1]]
         buttons = [tuple(map(int, b[1:-1].split(","))) for b in buttons_str]
-        machines.append((goal_state, buttons))
+        machines.append((target, buttons))
 
 min_pushes = 0
-for goal_state, buttons in machines:
+for target, buttons in machines:
     for n_pushes in range(1, 100):
-        for button_presses in combinations_with_replacement(buttons, n_pushes):
-            indicator = [False] * len(goal_state)
+        for button_combination in combinations_with_replacement(buttons, n_pushes):
+            indicator = [False] * len(target)
 
-            for positions in button_presses:
-                for i in positions:
-                    indicator[i] = not (indicator[i])
+            for button in button_combination:
+                for pos in button:
+                    indicator[pos] = not (indicator[pos])
 
-            if indicator == goal_state:
+            if indicator == target:
                 min_pushes += n_pushes
                 break
         else:
