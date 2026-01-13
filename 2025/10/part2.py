@@ -19,17 +19,15 @@ from pulp import LpMinimize, LpProblem, LpVariable, value
 with open("input.txt") as f:
     machines = []
     for line in f:
-        _, *buttons_input, target_input = line.split()
-        target = tuple(map(int, target_input[1:-1].split(",")))
-        buttons = [tuple(map(int, b[1:-1].split(","))) for b in buttons_input]
-        machines.append((target, buttons))
+        _, *input_tuples = line.split()
+        *buttons, V = (tuple(map(int, b[1:-1].split(","))) for b in input_tuples)
+        machines.append((buttons, V))
 
 total_presses = 0
-for target, buttons in machines:
-    k = len(target)
+for buttons, V in machines:
+    k = len(V)
     m = len(buttons)
 
-    V = target
     B = [[int(j in buttons[i]) for j in range(k)] for i in range(m)]
     N = [LpVariable(f"N_{i}", lowBound=0, cat="Integer") for i in range(m)]
 
