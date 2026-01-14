@@ -16,28 +16,26 @@ Solve V = N * B , minimizing sum(ni) for i..m
 
 from pulp import LpMinimize, LpProblem, LpVariable, value
 
+total_presses = 0
+
 with open("input.txt") as f:
-    machines = []
     for line in f:
         _, *input_tuples = line.split()
         *buttons, V = (tuple(map(int, b[1:-1].split(","))) for b in input_tuples)
-        machines.append((buttons, V))
 
-total_presses = 0
-for buttons, V in machines:
-    k = len(V)
-    m = len(buttons)
+        k = len(V)
+        m = len(buttons)
 
-    B = [[int(j in buttons[i]) for j in range(k)] for i in range(m)]
-    N = [LpVariable(f"N_{i}", lowBound=0, cat="Integer") for i in range(m)]
+        B = [[int(j in buttons[i]) for j in range(k)] for i in range(m)]
+        N = [LpVariable(f"n{i}", lowBound=0, cat="Integer") for i in range(m)]
 
-    prob = LpProblem("Minimize_sum(N)", LpMinimize)
-    prob += sum(N)
+        prob = LpProblem("min(sum(N))", LpMinimize)
+        prob.objective = sum(N)
 
-    for i in range(k):
-        prob += V[i] == sum(N[j] * B[j][i] for j in range(m))
+        for i in range(k):
+            prob.addConstraint(V[i] == sum(N[j] * B[j][i] for j in range(m)))
 
-    prob.solve()
-    total_presses += sum(map(value, N))
+        prob.solve()
+        total_presses += sum(map(value, N))
 
 print(f"{total_presses=}")
