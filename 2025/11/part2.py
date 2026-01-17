@@ -1,51 +1,26 @@
-from collections import deque
-from typing import NamedTuple
-
-
-class Node(NamedTuple):
-    label: str
-    next: list["Node"]
-
+from functools import lru_cache
 
 with open("input.txt") as f:
-    network: dict[str, Node] = {}
+    network: dict[str, list[str]] = {}
     for line in f:
         cur, *next_nodes = line.split()
-        cur = cur[:-1]
-        node = network.get(cur, Node(cur, []))
-        for nxt in next_nodes:
-            nxt_node = network.get(nxt, Node(nxt, []))
-            node.next.append(nxt_node)
-            network[nxt] = nxt_node
-        network[node.label] = node
+        network[cur[:-1]] = next_nodes
 
 
-def count_paths(start: str, end: str, network: dict[str, Node]) -> int:
-    queue = deque([network[start]])
-    n_paths = 0
-    i = 0
-    while queue:
-        node = queue.popleft()
-        if node.label == end:
-            n_paths += 1
-            i = 0
-        else:
-            queue += node.next
-        if i > 500_000_000:
-            break
-        i += 1
-    print(f"({start}, {end})={n_paths}")
-    return n_paths
+@lru_cache(maxsize=None)
+def count_paths(node: str, dac: bool, fft: bool) -> int:
+    if node == "dac":
+        dac = True
+    if node == "fft":
+        fft = True
+
+    if not network.get(node):
+        assert node == "out"
+        return int(dac and fft)
+    else:
+        return sum(count_paths(next, dac, fft) for next in network[node])
 
 
-n_paths = (
-    count_paths("dac", "out", network)
-    * count_paths("fft", "dac", network)
-    * count_paths("svr", "fft", network)
-) + (
-    count_paths("fft", "out", network)
-    * count_paths("dac", "fft", network)
-    * count_paths("svr", "dac", network)
-)
+n_paths = count_paths("svr", False, False)
 
 print(f"{n_paths=}")
